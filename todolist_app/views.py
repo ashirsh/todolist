@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.views import View
+from django.http import JsonResponse
+
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin,\
     CreateModelMixin, UpdateModelMixin, DestroyModelMixin
@@ -9,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import ToDoList
 from .serializers import ToDoListSerializer
 from .filters import ToDoListFilter
+from .settings_local import SERVER_VERSION
 
 
 # Create your views here.
@@ -65,5 +69,14 @@ class ToDoListCreateViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixi
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class ToDoListViewSet(View):
+    def get(self, request):
 
+        json_list = [{
+            'User': request.user.username,
+            'Version': SERVER_VERSION[0]
+        }]
 
+        return JsonResponse(json_list,
+                            safe=False,
+                            json_dumps_params={'indent': 4})
